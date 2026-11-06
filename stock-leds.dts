@@ -1,0 +1,36 @@
+/*
+ * LED-only correction for the connected stick, verified against its factory
+ * boot image and by a visible GPIO test. Not a universal UZ801 board profile.
+ *
+ * Decompile the original Linux DTB to original.dts, then compile this file
+ * with that directory on dtc's include path. All other hardware stays intact.
+ */
+/include/ "original.dts"
+
+&{/soc@0/pinctrl@1000000/gpio-leds-default-state} {
+	pins = "gpio71", "gpio72", "gpio73";
+};
+
+/* Factory 4g_1: use as a system-alive indicator, not a claim of LTE service. */
+&{/leds/led-r} {
+	/delete-property/ color;
+	label = "uz801:status";
+	function = "status";
+	gpios = <&{/soc@0/pinctrl@1000000} 71 0>;
+	default-state = "off";
+	linux,default-trigger = "heartbeat";
+};
+
+/* Factory wifistatus. Leave off until explicitly assigned a radio trigger. */
+&{/leds/led-g} {
+	/delete-property/ color;
+	label = "uz801:wlan";
+	gpios = <&{/soc@0/pinctrl@1000000} 73 0>;
+};
+
+/* Factory 4g_type. Leave off: the cellular interfaces are not connected. */
+&{/leds/led-b} {
+	/delete-property/ color;
+	label = "uz801:wan";
+	gpios = <&{/soc@0/pinctrl@1000000} 72 0>;
+};
